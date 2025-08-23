@@ -2,3 +2,4 @@ pyshark
 netifaces
 httpx
 asyncio
+requests
