@@ -8,15 +8,13 @@ import logging
 from pyshark.packet.packet import Packet
 import httpx
 import asyncio
-from dotenv import load_dotenv
-import os
 
-
+# Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 
-
-class Data_Packet(object):
+# === DATA CLASSES ===
+class pckt(object):
     def __init__(self, sniff_timestamp: str = '', layer: str = '', srcPort: str = '', dstPort: str = '',
                  ipSrc: str = '', ipDst: str = '', highest_layer='',location:str=''):
         self.sniff_timestamp = sniff_timestamp
@@ -35,11 +33,14 @@ class apiServer(object):
         self.port = port
 
 
-load_dotenv()
-server = apiServer(os.getenv('my_ipadd'),os.getenv('my_port'))
+# === SETUP ===
+server = apiServer('192.168.2.132', '8080')
 
+# Get default IPv4 interface
 intF = netifaces.gateways()['default'][netifaces.AF_INET][1]
 capture = pyshark.LiveCapture(interface=intF)
+
+#get Geo Location 
 async def geolocation(ip)->str:
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -52,11 +53,13 @@ async def geolocation(ip)->str:
     except Exception as e:
         return f"Geo Lookup failed Error:{e}"
     
-def report(message: Data_Packet):
+# === REPORT FUNCTION ===
+def report(message: pckt):
     try:
         json_data = json.dumps(message.__dict__).encode('utf-8')
         b64_payload = base64.b64encode(json_data).decode('utf-8')
 
+        # Using POST instead of GET for better reliability
         url = f"http://{server.ip}:{server.port}/api/"
         headers = {'Content-Type': 'application/json'}
 
@@ -68,8 +71,9 @@ def report(message: Data_Packet):
         logging.error(f"Failed to send packet data: {err}")
 
 
+# === HELPER FUNCTIONS ===
 def is_api_server(packet: Packet, server: apiServer) -> bool:
-    #Check if the packet is communicating with our API
+    #Check if the packet is communicating with our API server
     if hasattr(packet, 'ip') and hasattr(packet, 'tcp'):
         if ((packet.ip.src == server.ip or packet.ip.dst == server.ip) and
                 (packet.tcp.dstport == server.port or packet.tcp.srcport == server.port)):
@@ -100,11 +104,12 @@ def is_external_network(ip_dst: str, interface: str) -> bool:
         logging.error(f"Error checking external network: {e}")
         return False
 def packetFilter(packet: Packet):
+    #Filter and handle packet logic
     if is_api_server(packet, server):
-        return 
+        return  # Skip reporting traffic to the API server
 
     if hasattr(packet, 'icmp'):
-        p = Data_Packet()
+        p = pckt()
         p.sniff_timestamp = packet.sniff_timestamp
         p.ipDst = packet.ip.dst
         p.ipSrc = packet.ip.src
@@ -113,6 +118,7 @@ def packetFilter(packet: Packet):
         return
 
     if packet.transport_layer in ['TCP', 'UDP']:
+        # Skip IPv6 special protocols
         if hasattr(packet, 'ipv6'):
             for skip_layer in ['mdns', 'dhcpv6', 'ssdp', 'llmnr']:
                 if hasattr(packet, skip_layer):
@@ -121,7 +127,7 @@ def packetFilter(packet: Packet):
         if hasattr(packet, 'ip'):
             
             if is_private_ip(packet.ip.src) and is_private_ip(packet.ip.dst):
-                p = Data_Packet()
+                p = pckt()
                 p.sniff_timestamp = packet.sniff_timestamp
                 p.ipSrc = packet.ip.src
                 p.ipDst = packet.ip.dst
@@ -137,22 +143,9 @@ def packetFilter(packet: Packet):
 
                 report(p)
             elif is_external_network(packet.ip.dst, intF):
-                logging.info(f"External Network Detected on Interface: ")
-                et=Data_Packet()
-                et.sniff_timestamp=packet.sniff_timestamp
-                et.ipSrc=packet.ip.src
-                et.ipDst=packet.ip.dst
-                et.highest_layer=packet.highest_layer
-                et.layer=packet.transport_layer
-                et.location=asyncio.run(geolocation(packet.ip.dst))
-                if hasattr(packet, 'udp'):
-                    et.srcPort = packet.udp.srcport
-                    et.dstPort = packet.udp.dstport
-                if hasattr(packet, 'tcp'):
-                    et.srcPort = packet.tcp.srcport
-                    et.dstPort = packet.tcp.dstport
-                
-                report(et)
+                logging.info(f"Packet going to external network: {packet.ip.dst} organizarion:"+ asyncio.run(geolocation(packet.ip.dst)))    
+
+# === MAIN LOOP ===
 if __name__ == "__main__":
     logging.info(f"Starting capture on interface: {intF}")
     for packet in capture.sniff_continuously():

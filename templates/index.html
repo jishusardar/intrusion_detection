@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Received Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Received JSON Data</h2>
+    {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th> Network Layer</th>
+                    <th>Source Port</th>
+                    <th>Destination Port</th>
+                    <th>Source IP Address</th>
+                    <th>Destination IP Address</th>
+                    <th>Highest Layer</th>
+                    <th>Organization</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        {% for value in row.values() %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center;">No data received yet.</p>
+    {% endif %}
+</body>
+</html>

@@ -3,3 +3,5 @@ netifaces
 httpx
 asyncio
 requests
+flask
+python-dotenv
