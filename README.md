@@ -24,14 +24,17 @@ pip3 install -r requirements.txt
 python3 setup.py
 python3 main.py
 ```
-
-## The GUI Mode
-Packet Sniffing Started and then
-In Another Terminal Tab
+## Start GUI Mode
 ```bash
 python3 api_server.py
 ```
 Starts The Flask-based Web Interface For Data Monitoring
+
+## Start Packet Monitoring
+In another Terminal Tab, Start Packet Monitoring
+```bash
+python3 main.py
+```
 ## File structure
 you should have a file structure like this:
 ```bash
