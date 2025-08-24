@@ -51,4 +51,5 @@ intrusion_detection/
 ![Demo GUI](https://github.com/jishusardar/intrusion_detection/blob/main/Demo.png)
 
 ## Demo Video:
+https://youtu.be/JNrdr-AJxAY
 
