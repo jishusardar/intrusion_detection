@@ -69,7 +69,7 @@ def report(message: Data_Packet):
 
 
 def is_api_server(packet: Packet, server: apiServer) -> bool:
-    #Check if the packet is communicating with our API
+    
     if hasattr(packet, 'ip') and hasattr(packet, 'tcp'):
         if ((packet.ip.src == server.ip or packet.ip.dst == server.ip) and
                 (packet.tcp.dstport == server.port or packet.tcp.srcport == server.port)):
@@ -78,24 +78,16 @@ def is_api_server(packet: Packet, server: apiServer) -> bool:
 
 
 def is_private_ip(ip_address):
-    #Check if IP is private
     ip = ipaddress.ip_address(ip_address)
     return ip.is_private
 
 def is_external_network(ip_dst: str, interface: str) -> bool:
-    """Check if destination IP is outside the local network subnet"""
     try:
-        # Get IP and netmask of the interface
         iface_info = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]
         local_ip = iface_info['addr']
         netmask = iface_info['netmask']
-
-        # Build the subnet
         network = ipaddress.IPv4Network(f"{local_ip}/{netmask}", strict=False)
-
-        # Check if destination IP is within that subnet
         return ipaddress.IPv4Address(ip_dst) not in network
-
     except Exception as e:
         logging.error(f"Error checking external network: {e}")
         return False

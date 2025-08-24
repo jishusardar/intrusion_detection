@@ -5,3 +5,4 @@ asyncio
 requests
 flask
 python-dotenv
+flask
