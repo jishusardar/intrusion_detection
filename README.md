@@ -11,7 +11,7 @@ pip3 install -r requirements.txt
 python3 setup.py
 python3 main.py
 ```
-The Packet sniffing Started...
+The Packet sniffing started...
 
 ## File structure
 You should have a file structure like this:
@@ -26,7 +26,7 @@ intrusion_detection/
     └── index.html
 ```
 ## The GUI Mode
-for gui use 
+for GUI Use
 ```bash
 python3 api_server.py
 ```
