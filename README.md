@@ -2,6 +2,7 @@
 # Real Time Intrusion Detection System
 
 A Real-Time Intrusion Detection System is Used To Detect Any Outsider's Intrusion Inside a Network. This Tool Uses wireshark and Python Library Pyshark to sniff the Data Packets of Protocol TCP and UDP from the Host Machine and Captures The Data Packets Within The Network and Outside The Network and Label Them Data Transmission Within the Network such as router Labeled as Own Network and Data Transmission Outside The Network is Labeled as Their Organization Name And render Them in an flask Based GUI for convinence.
+```bash
 🔍 Monitors live packet flows with PyShark and Wireshark integration
 📊 Analyses TCP/UDP protocols with detailed logs on host machines
 🏷️ Labels traffic behaviour - internal communication versus external traffic
@@ -14,6 +15,7 @@ Currently, it is configured for macOS/Linux network interfaces only.
 ❇️ All the Python Modules are handled by the requirements.txt
 🤖 The main.py is the file that fetches the network interface using netifaces, sniffs the Data Packets in real Time, and labels them within the network as Own Network and Outside Network, as Organization Name by using an asynchronous function to call api using httpx, and Filters The Data Packets by TCP and UDP Protocols and Send Report To The Host Machine.
  📁 The api_server.py renders Data That Is acquired by the class Data_Packet in the webpage On The Host Machine IP and Port that is already configured by setup.py.
+```
 
 ## Requirements
 ### Wireshark
