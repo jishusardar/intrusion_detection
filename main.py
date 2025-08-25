@@ -76,6 +76,11 @@ def is_api_server(packet: Packet, server: apiServer) -> bool:
             return True
     return False
 
+def is_async_api(packet: Packet,server: str)->bool:
+    if(hasattr(packet,'ip')and hasattr(packet,'tcp')):
+        if(str(packet.ip.src) == server or str(packet.ip.dst) == server):
+            return True
+    return False
 
 def is_private_ip(ip_address):
     ip = ipaddress.ip_address(ip_address)
@@ -94,7 +99,9 @@ def is_external_network(ip_dst: str, interface: str) -> bool:
 def packetFilter(packet: Packet):
     if is_api_server(packet, server):
         return 
-
+    if(is_async_api(packet,"208.95.112.1")):
+        return 
+        
     if hasattr(packet, 'icmp'):
         p = Data_Packet()
         p.sniff_timestamp = packet.sniff_timestamp
